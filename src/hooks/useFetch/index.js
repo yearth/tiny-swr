@@ -34,6 +34,7 @@ export const useFetch = (url, fetcher) => {
     try {
       const data = await _fetcher(`${prefixUrl}${url}`);
       setState(data.result);
+      setError(false);
     } catch (err) {
       setError(true);
     }
