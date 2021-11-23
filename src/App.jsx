@@ -1,14 +1,15 @@
 import { useFetch } from "./hooks/useFetch";
-import { customFetch } from "./shared";
 
 function App() {
-  const [user = {}, error, loading] = useFetch("/user", customFetch);
+  const [user] = useFetch("/user");
+  const [articles] = useFetch(() => `/articles/${user?.userId}`);
 
   return (
     <div>
-      {loading && <span>loading...</span>}
-      {error && <span>something went wrong</span>}
-      {!loading && !error && <span>welcome {user.name}!</span>}
+      {<span>welcome {user?.name}!</span>}
+      {articles?.map((v, i) => (
+        <div key={i}>{v.title}</div>
+      ))}
     </div>
   );
 }
