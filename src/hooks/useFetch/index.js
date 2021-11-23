@@ -1,6 +1,7 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useCallback } from "react";
 import { useFetchConfigContext } from "./context";
 import { prefixUrl } from "../../shared";
+import { unstable_batchedUpdates } from "react-dom";
 
 const getKeyArgs = key => {
   let _key;
@@ -18,34 +19,40 @@ const getKeyArgs = key => {
   return _key;
 };
 
-export const useFetch = (url, fetcher) => {
+export const useFetch = (url, fetcher, options = {}) => {
   const [state, setState] = useState(undefined);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const config = useContext(useFetchConfigContext);
+  const config = Object.assign({}, useContext(useFetchConfigContext), options);
   const _fetcher = typeof fetcher === "function" ? fetcher : config.fetcher;
 
   const key = getKeyArgs(url);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
+    if (!key) return false;
     setLoading(true);
 
     try {
-      const data = await _fetcher(`${prefixUrl}${url}`);
-      setState(data.result);
-      setError(false);
-    } catch (err) {
-      setError(true);
+      const data = await _fetcher(`${prefixUrl}${key}`);
+      unstable_batchedUpdates(() => {
+        setState(data.result);
+        setError(false);
+        setIsLoading(false);
+      });
+    } catch (error) {
+      unstable_batchedUpdates(() => {
+        setError(true);
+        setLoading(false);
+      });
     }
 
-    setLoading(false);
-  };
+    return true;
+  }, [key]);
 
   useEffect(() => {
-    console.log("entry", key);
     fetchData();
-  }, [key]);
+  }, [fetchData]);
 
   return [state, error, loading];
 };
