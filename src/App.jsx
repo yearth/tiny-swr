@@ -1,27 +1,7 @@
-import { useState, useEffect } from "react";
-import { prefixUrl } from "./shared";
+import { useFetch } from "./hooks/useFetch";
 
 function App() {
-  const [user, setUser] = useState({});
-  const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-
-      try {
-        const resp = await fetch(`${prefixUrl}/user`);
-        const data = await resp.json();
-        setUser(data.result);
-      } catch (err) {
-        setError(err);
-      }
-
-      setLoading(false);
-    };
-    fetchData();
-  }, []);
+  const [user = {}, error, loading] = useFetch("/user");
 
   return (
     <div>
