@@ -1,7 +1,8 @@
 import { useFetch } from "./hooks/useFetch";
+import { customFetch } from "./shared";
 
 function App() {
-  const [user = {}, error, loading] = useFetch("/user");
+  const [user = {}, error, loading] = useFetch("/user", customFetch);
 
   return (
     <div>

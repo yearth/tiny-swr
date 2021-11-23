@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { prefixUrl } from "../shared";
 
-export const useFetch = url => {
+export const useFetch = (url, fetcher) => {
   const [state, setState] = useState(undefined);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -11,8 +11,7 @@ export const useFetch = url => {
       setLoading(true);
 
       try {
-        const resp = await fetch(`${prefixUrl}${url}`);
-        const data = await resp.json();
+        const data = await fetcher(`${prefixUrl}${url}`);
         setState(data.result);
       } catch (err) {
         setError(true);
